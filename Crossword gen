@@ -1,0 +1,110 @@
+import random
+
+class CrosswordGenerator:
+    def __init__(self, size):
+        self.size = size
+        self.grid = [[' ' for _ in range(size)] for _ in range(size)]
+        self.words = []
+
+    def add_word(self, word):
+        self.words.append(word)
+
+    def generate_crossword(self):
+        for word in self.words:
+            self.place_word(word)
+
+        self.fill_empty_cells()
+
+    def place_word(self, word):
+        direction = random.choice(['across', 'down'])
+        if direction == 'across':
+            self.place_word_across(word)
+        else:
+            self.place_word_down(word)
+
+    def place_word_across(self, word):
+        row = random.randint(0, self.size - 1)
+        col = random.randint(0, self.size - len(word))
+        for i, letter in enumerate(word):
+            self.grid[row][col + i] = letter
+
+    def place_word_down(self, word):
+        row = random.randint(0, self.size - len(word))
+        col = random.randint(0, self.size - 1)
+        for i, letter in enumerate(word):
+            self.grid[row + i][col] = letter
+
+    def fill_empty_cells(self):
+        for i in range(self.size):
+            for j in range(self.size):
+                if self.grid[i][j] == ' ':
+                    self.grid[i][j] = random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+
+    def display_crossword(self):
+        for row in self.grid:
+            print(' '.join(row))
+
+class CrosswordSolver:
+    def __init__(self, grid, words):
+        self.grid = grid
+        self.words = words
+        self.size = len(grid)
+
+    def solve_crossword(self):
+        for word in self.words:
+            if not self.place_word(word):
+                return False
+        return True
+
+    def place_word(self, word):
+        for i in range(self.size):
+            for j in range(self.size - len(word) + 1):
+                if self.check_horizontal(word, i, j):
+                    self.fill_horizontal(word, i, j)
+                    return True
+                elif self.check_vertical(word, i, j):
+                    self.fill_vertical(word, i, j)
+                    return True
+        return False
+
+    def check_horizontal(self, word, row, col):
+        for i, letter in enumerate(word):
+            if self.grid[row][col + i] != ' ' and self.grid[row][col + i] != letter:
+                return False
+        return True
+
+    def fill_horizontal(self, word, row, col):
+        for i, letter in enumerate(word):
+            self.grid[row][col + i] = letter
+
+    def check_vertical(self, word, row, col):
+        for i, letter in enumerate(word):
+            if self.grid[row + i][col] != ' ' and self.grid[row + i][col] != letter:
+                return False
+        return True
+
+    def fill_vertical(self, word, row, col):
+        for i, letter in enumerate(word):
+            self.grid[row + i][col] = letter
+
+    def display_solution(self):
+        for row in self.grid:
+            print(' '.join(row))
+
+
+# Example usage:
+crossword_generator = CrosswordGenerator(10)
+crossword_generator.add_word("PYTHON")
+crossword_generator.add_word("JAVA")
+crossword_generator.add_word("CROSSWORD")
+crossword_generator.generate_crossword()
+crossword_generator.display_crossword()
+
+print("\nSolving the crossword...\n")
+
+crossword_solver = CrosswordSolver(crossword_generator.grid, ["PYTHON", "JAVA", "CROSSWORD"])
+if crossword_solver.solve_crossword():
+    print("Crossword solved successfully!")
+    crossword_solver.display_solution()
+else:
+    print("Failed to solve the crossword.")
