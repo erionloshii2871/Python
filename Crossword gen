@@ -54,6 +54,18 @@ class CrosswordGenerator:
             line = ' '.join(row)
             print(f"{i + 1:2d}. {line}")
 
+    def save_crossword(self, filename):
+        with open(filename, 'w') as file:
+            file.write(f"Size: {self.size}\n\n")
+            file.write("Crossword Grid:\n")
+            for i, row in enumerate(self.grid):
+                line = ' '.join(row)
+                file.write(f"{i + 1:2d}. {line}\n")
+            file.write("\nWords Included:\n")
+            for i, word in enumerate(self.words):
+                file.write(f"{i + 1}. {word}\n")
+
+
 class CrosswordSolver:
     def __init__(self, grid, words):
         self.grid = grid
@@ -105,16 +117,25 @@ class CrosswordSolver:
 
 
 # Example usage:
-crossword_generator = CrosswordGenerator(10)
-crossword_generator.get_user_input()
-crossword_generator.generate_crossword()
-crossword_generator.display_crossword()
+def main():
+    crossword_generator = CrosswordGenerator(10)
+    crossword_generator.get_user_input()
+    crossword_generator.generate_crossword()
+    crossword_generator.display_crossword()
 
-print("\nSolving the crossword...\n")
+    filename = input("\nEnter filename to save the crossword (or press Enter to skip): ")
+    if filename:
+        crossword_generator.save_crossword(filename)
+        print(f"Crossword saved to {filename}")
 
-crossword_solver = CrosswordSolver(crossword_generator.grid, crossword_generator.words)
-if crossword_solver.solve_crossword():
-    print("Crossword solved successfully!")
-    crossword_solver.display_solution()
-else:
-    print("Failed to solve the crossword.")
+    print("\nSolving the crossword...\n")
+
+    crossword_solver = CrosswordSolver(crossword_generator.grid, crossword_generator.words)
+    if crossword_solver.solve_crossword():
+        print("Crossword solved successfully!")
+        crossword_solver.display_solution()
+    else:
+        print("Failed to solve the crossword.")
+
+if __name__ == "__main__":
+    main()
